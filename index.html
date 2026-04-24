@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bootcamp Attendance Portal</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand"><span>🎓</span><span>Bootcamp Attendance</span></div>
+  <div class="nav-links">
+    <a href="#" class="nav-link active" data-tab="register">📝 Register</a>
+    <a href="#" class="nav-link" data-tab="morning">🌅 Morning</a>
+    <a href="#" class="nav-link" data-tab="afternoon">🌆 Afternoon OTP</a>
+    <a href="/admin" class="nav-link nav-admin">🔐 Admin</a>
+  </div>
+</nav>
+<main class="container">
+
+  <!-- REGISTER -->
+  <section id="tab-register" class="tab active">
+    <div class="card">
+      <div class="card-header">
+        <h2>📝 Participant Registration</h2>
+        <p class="subtitle">Register once — your phone number is your unique ID for all 6 days</p>
+      </div>
+      <form id="registerForm" class="form" novalidate>
+        <div class="form-group">
+          <label for="full_name">Full Name <span class="req">*</span></label>
+          <input type="text" id="full_name" placeholder="Enter your full name"/>
+          <span class="field-error" id="err-name"></span>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="example@email.com"/>
+          <span class="field-error" id="err-email"></span>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number <span class="req">*</span></label>
+          <div class="phone-input">
+            <span class="phone-prefix">+91</span>
+            <input type="tel" id="phone" placeholder="10-digit number" maxlength="10"/>
+          </div>
+          <span class="field-error" id="err-phone"></span>
+        </div>
+        <div class="form-group">
+          <label for="college">College / Institution</label>
+          <input type="text" id="college" placeholder="Your college name"/>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="registerBtn">Register Now</button>
+      </form>
+      <div id="registerResult"></div>
+    </div>
+  </section>
+
+  <!-- MORNING STATUS -->
+  <section id="tab-morning" class="tab">
+    <div class="card">
+      <div class="card-header">
+        <h2>🌅 Morning Attendance</h2>
+        <p class="subtitle">Morning attendance is marked by the admin / coordinator</p>
+      </div>
+      <div class="info-box">
+        <span class="info-icon">ℹ️</span>
+        <div>
+          <strong>How it works</strong>
+          <p>Your coordinator marks morning attendance on the admin dashboard. Enter your phone below to check your status.</p>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <h3 style="margin-bottom:12px;font-size:16px;font-weight:600">Check My Attendance</h3>
+      <div class="form-group">
+        <label>Registered Phone Number</label>
+        <div class="phone-input">
+          <span class="phone-prefix">+91</span>
+          <input type="tel" id="checkPhone" placeholder="10-digit number" maxlength="10"/>
+        </div>
+      </div>
+      <button class="btn btn-secondary" onclick="checkMyAttendance()" style="margin-top:10px">Check Status</button>
+      <div id="attendanceStatus" style="margin-top:20px"></div>
+    </div>
+  </section>
+
+  <!-- AFTERNOON OTP -->
+  <section id="tab-afternoon" class="tab">
+    <div class="card">
+      <div class="card-header">
+        <h2>🌆 Afternoon Attendance</h2>
+        <p class="subtitle">Verify with OTP sent to your registered phone</p>
+      </div>
+
+      <div id="step1">
+        <div class="steps-row">
+          <div class="step-dot active">1</div><div class="step-line"></div>
+          <div class="step-dot">2</div><div class="step-line"></div>
+          <div class="step-dot">✓</div>
+        </div>
+        <form id="otpRequestForm" class="form">
+          <div class="form-group">
+            <label>Registered Phone <span class="req">*</span></label>
+            <div class="phone-input">
+              <span class="phone-prefix">+91</span>
+              <input type="tel" id="otp_phone" placeholder="10-digit number" maxlength="10"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Select Day <span class="req">*</span></label>
+            <select id="otp_day">
+              <option value="">-- Choose Day --</option>
+              <option value="1">Day 1</option><option value="2">Day 2</option>
+              <option value="3">Day 3</option><option value="4">Day 4</option>
+              <option value="5">Day 5</option><option value="6">Day 6</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" id="sendOtpBtn">Send OTP →</button>
+        </form>
+        <div id="otpRequestResult"></div>
+      </div>
+
+      <div id="step2" class="hidden">
+        <div class="steps-row">
+          <div class="step-dot done">✓</div><div class="step-line done"></div>
+          <div class="step-dot active">2</div><div class="step-line"></div>
+          <div class="step-dot">✓</div>
+        </div>
+        <div class="otp-info-box" id="otpInfoBox"></div>
+        <form id="otpVerifyForm" class="form">
+          <div class="form-group">
+            <label style="text-align:center;display:block;margin-bottom:12px">Enter 6-Digit OTP</label>
+            <div class="otp-boxes">
+              <input class="otp-box" type="tel" maxlength="1" id="o1"/>
+              <input class="otp-box" type="tel" maxlength="1" id="o2"/>
+              <input class="otp-box" type="tel" maxlength="1" id="o3"/>
+              <input class="otp-box" type="tel" maxlength="1" id="o4"/>
+              <input class="otp-box" type="tel" maxlength="1" id="o5"/>
+              <input class="otp-box" type="tel" maxlength="1" id="o6"/>
+            </div>
+            <div id="otpTimer" class="otp-timer"></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" id="verifyBtn">Verify & Mark Attendance ✓</button>
+          <button type="button" class="btn btn-ghost btn-full" onclick="resetOtp()" style="margin-top:8px">← Back / Resend OTP</button>
+        </form>
+        <div id="otpVerifyResult"></div>
+      </div>
+
+      <div id="step3" class="hidden">
+        <div class="steps-row">
+          <div class="step-dot done">✓</div><div class="step-line done"></div>
+          <div class="step-dot done">✓</div><div class="step-line done"></div>
+          <div class="step-dot done">✓</div>
+        </div>
+        <div class="success-screen">
+          <div class="success-icon">✅</div>
+          <h3 id="successTitle">Attendance Marked!</h3>
+          <p id="successMsg" class="subtitle" style="margin-top:8px"></p>
+          <button class="btn btn-secondary" onclick="resetOtp()" style="margin-top:24px">Mark Another Day</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin – Bootcamp Attendance</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="admin-body">
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">🔐</div>
+    <h2>Admin Login</h2>
+    <p class="subtitle">Bootcamp Attendance System</p>
+    <form id="loginForm" class="form" style="margin-top:24px">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="adminUser" placeholder="admin" autocomplete="username"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" placeholder="••••••••" autocomplete="current-password"/>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" id="loginBtn">Login</button>
+      <div id="loginErr" class="msg msg-error hidden" style="margin-top:12px"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp" class="hidden">
+  <nav class="navbar admin-nav">
+    <div class="nav-brand"><span>🎓</span><span>Bootcamp Admin</span></div>
+    <div class="nav-links">
+      <a href="#" class="nav-link active" data-atab="dashboard">📊 Dashboard</a>
+      <a href="#" class="nav-link" data-atab="participants">👥 Participants</a>
+      <a href="#" class="nav-link" data-atab="attendance">📋 Attendance</a>
+      <a href="#" class="nav-link" data-atab="mark">✅ Mark</a>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </nav>
+  <main class="admin-main">
+
+    <!-- DASHBOARD -->
+    <section id="atab-dashboard" class="atab active">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <button class="btn btn-secondary btn-sm" onclick="loadDashboard()">↺ Refresh</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total Participants</div><div class="stat-val" id="dTotal">—</div></div>
+        <div class="stat-card"><div class="stat-label">Total Records</div><div class="stat-val" id="dRecords">—</div></div>
+        <div class="stat-card"><div class="stat-label">Morning (Today)</div><div class="stat-val" id="dMorning">—</div></div>
+        <div class="stat-card"><div class="stat-label">Afternoon (Today)</div><div class="stat-val" id="dAfternoon">—</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h3 style="margin-bottom:16px">Attendance by Day</h3>
+          <div id="dayChart"></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:16px">Recent Registrations</h3>
+          <div id="recentRegs"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:20px">
+        <h3 style="margin-bottom:14px">Export CSV</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <button class="btn btn-secondary" onclick="exportCSV()">📥 Full Export</button>
+          <div id="dayExportBtns" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PARTICIPANTS -->
+    <section id="atab-participants" class="atab hidden">
+      <div class="page-header">
+        <h1>Participants <span class="count-badge" id="pCount">0</span></h1>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <input type="text" id="pSearch" placeholder="Search name, phone, college…" oninput="filterParticipants()" style="min-width:220px"/>
+          <button class="btn btn-secondary btn-sm" onclick="exportCSV()">📥 Export CSV</button>
+        </div>
+      </div>
+      <div class="card p0">
+        <table class="dtable">
+          <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Email</th><th>College</th><th>Registered</th><th>Actions</th></tr></thead>
+          <tbody id="pTbody"><tr><td colspan="7" class="empty-cell">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ATTENDANCE VIEW -->
+    <section id="atab-attendance" class="atab hidden">
+      <div class="page-header">
+        <h1>Attendance Records</h1>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <select id="dayFilter" onchange="loadAttView()">
+            <option value="1">Day 1</option><option value="2">Day 2</option>
+            <option value="3">Day 3</option><option value="4">Day 4</option>
+            <option value="5">Day 5</option><option value="6">Day 6</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" onclick="exportDayCSV()">📥 Export Day</button>
+        </div>
+      </div>
+      <div class="card p0">
+        <table class="dtable">
+          <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>College</th><th class="tc">☀️ Morning</th><th class="tc">🌆 Afternoon</th></tr></thead>
+          <tbody id="attTbody"><tr><td colspan="6" class="empty-cell">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card" style="margin-top:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <h3>Full Summary — All 6 Days</h3>
+          <button class="btn btn-secondary btn-sm" onclick="exportCSV()">📥 Export Full</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="dtable summary-tbl" id="summaryTbl">
+            <thead id="summaryHead"></thead>
+            <tbody id="summaryBody"><tr><td class="empty-cell">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- MARK ATTENDANCE -->
+    <section id="atab-mark" class="atab hidden">
+      <div class="page-header"><h1>Mark Attendance</h1></div>
+      <div id="markMsg" class="msg hidden" style="margin-bottom:16px"></div>
+      <div class="grid2">
+
+        <div class="card">
+          <h3>🌅 Morning Session</h3>
+          <p class="subtitle" style="margin-bottom:16px">Bulk-mark all participants or individual ones</p>
+          <div class="form-group">
+            <label>Day</label>
+            <select id="morningDay">
+              <option value="1">Day 1</option><option value="2">Day 2</option>
+              <option value="3">Day 3</option><option value="4">Day 4</option>
+              <option value="5">Day 5</option><option value="6">Day 6</option>
+            </select>
+          </div>
+          <button class="btn btn-success" onclick="bulkMorning()" style="width:100%;margin-top:4px">✓ Mark ALL Present (Morning)</button>
+          <div class="divider"></div>
+          <h4 style="margin-bottom:10px;font-size:14px;font-weight:600">Individual Mark</h4>
+          <input type="text" id="mSearch" placeholder="Search participant…" oninput="filterMark('morning')" style="margin-bottom:10px"/>
+          <div id="mList" class="indiv-list"></div>
+        </div>
+
+        <div class="card">
+          <h3>🌆 Afternoon (Admin Override)</h3>
+          <p class="subtitle" style="margin-bottom:16px">Manually mark afternoon without OTP</p>
+          <div class="form-group">
+            <label>Day</label>
+            <select id="afternoonDay">
+              <option value="1">Day 1</option><option value="2">Day 2</option>
+              <option value="3">Day 3</option><option value="4">Day 4</option>
+              <option value="5">Day 5</option><option value="6">Day 6</option>
+            </select>
+          </div>
+          <input type="text" id="aSearch" placeholder="Search participant…" oninput="filterMark('afternoon')" style="margin-bottom:10px;margin-top:14px"/>
+          <div id="aList" class="indiv-list"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- PARTICIPANT MODAL -->
+<div id="modal" class="modal hidden">
+  <div class="modal-bg" onclick="closeModal()"></div>
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 id="modalTitle" style="margin-bottom:6px"></h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

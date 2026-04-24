@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: bootcamp-attendance
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2
+    envVars:
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        value: admin@123
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FAST2SMS_KEY
+        value: YOUR_FAST2SMS_KEY_HERE
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    disk:
+      name: db-storage
+      mountPath: /data
+      sizeGB: 1
